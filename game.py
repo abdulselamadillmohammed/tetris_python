@@ -1,5 +1,6 @@
 # game.py
 from settings import *
+from random import choice
 
 class Game:
     def __init__(self):
@@ -17,7 +18,7 @@ class Game:
         self.line_surface.set_alpha(120)
 
         # test
-        self.block = Block(self.sprites, pygame.Vector2(3,5), "blue")
+        self.tetromino = Tetromino(choice(list(TETROMINOS.keys())), self.sprites)
 
     def draw_grid(self):
         for col in range(1,COLUMNS):
@@ -46,8 +47,18 @@ class Block(pygame.sprite.Sprite):
 
 
         # position
-        self.pos = pos
-        x = pos.x * CELL_SIZE
-        y = pos.y * CELL_SIZE
-        self.rect = self.image.get_rect(topleft = (0,0))
+        self.pos = pygame.Vector2(pos) + BLOCK_OFFSET
 
+        x = self.pos.x * CELL_SIZE
+        y = self.pos.y * CELL_SIZE
+        self.rect = self.image.get_rect(topleft = (x, y))
+
+class Tetromino:
+    def __init__(self, shape, group):
+        
+        # setup
+        self.block_positions = TETROMINOS[shape]['shape']
+        self.color = TETROMINOS[shape]['color']
+
+        # create blocks
+        self.blocks = [Block(group, pos, self.color) for pos in self.block_positions]
