@@ -1,3 +1,5 @@
+# score.py
+
 from settings import *
 
 class Score:
