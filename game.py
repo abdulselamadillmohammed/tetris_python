@@ -38,6 +38,7 @@ class Game:
         self.timers['vertical move'].activate()
 
     def create_new_tetromino(self):
+        self.check_finished_rows()
         self.tetromino = Tetromino(
             choice(list(TETROMINOS.keys())),
             self.sprites,
@@ -82,11 +83,17 @@ class Game:
                 delete_rows.append(i)
 
         if delete_rows:
-            for delete_rows in delete_rows:
+            for delete_row in delete_rows:
                 
                 # delete full rows
                 for block in self.field_data[delete_rows]:
                     block.kill()
+
+                # move down blocks
+                for row in self.field_data:
+                    for block in row:
+                        if block and block.pos.y < delete_row:
+                            block.pos.y += 1
 
     def run(self):
         self.input()
