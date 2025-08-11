@@ -19,9 +19,10 @@ class Game:
         self.line_surface.set_colorkey((0, 255, 0))
         self.line_surface.set_alpha(120)
 
+        # 2D grid: ROWS x COLUMNS (falsy until a block is placed)
+        self.field_data = [[0 for _ in range(COLUMNS)] for _ in range(ROWS)]
 
-        self.field_data = [0 for x in range(COLUMNS) for y in range(ROWS)]        
-        # tetromino  ✅ pass the callback
+        # tetromino
         self.tetromino = Tetromino(
             choice(list(TETROMINOS.keys())),
             self.sprites,
@@ -31,13 +32,12 @@ class Game:
 
         self.timers = {
             'vertical move': Timer(UPDATE_START_SPEED, True, self.move_down),
-            'horizontal move': Timer(MOVE_WAIT_TIME)  # trailing comma is fine; single arg
+            'horizontal move': Timer(MOVE_WAIT_TIME)
         }
 
         self.timers['vertical move'].activate()
 
     def create_new_tetromino(self):
-        # ✅ use self.sprites (not self.sprite) and pass the callback again
         self.tetromino = Tetromino(
             choice(list(TETROMINOS.keys())),
             self.sprites,
@@ -96,18 +96,17 @@ class Tetromino:
         self.color = TETROMINOS[shape]['color']
         self.create_new_tetromino = create_new_tetromino
         self.field_data = field_data
+
         # create blocks
         self.blocks = [Block(group, pos, self.color) for pos in self.block_positions]
 
-        # callback into Game to spawn the next piece when this one lands
-
     # collisions
     def next_move_horizontal_collide(self, blocks, amount):
-        collision_list = [block.horizontal_collide(int(block.pos.x + amount)) for block in self.blocks]
+        collision_list = [block.horizontal_collide(int(block.pos.x + amount), self.field_data) for block in self.blocks]
         return True if any(collision_list) else False
 
     def next_move_vertical_collide(self, blocks, amount):
-        collision_list = [block.vertical_collide(int(block.pos.y + amount)) for block in self.blocks]
+        collision_list = [block.vertical_collide(int(block.pos.y + amount), self.field_data) for block in self.blocks]
         return True if any(collision_list) else False
 
     def move_horizontal(self, amount):
@@ -120,9 +119,13 @@ class Tetromino:
             for block in self.blocks:
                 block.pos.y += 1
         else:
-            # landed → ask Game to create the next piece
+            # landed → lock into grid
+            for block in self.blocks:
+                self.field_data[int(block.pos.y)][int(block.pos.x)] = block
             self.create_new_tetromino()
 
+            for row in self.field_data:
+                print(row)
 
 class Block(pygame.sprite.Sprite):
     def __init__(self, group, pos, color):
@@ -134,15 +137,22 @@ class Block(pygame.sprite.Sprite):
         self.pos = pygame.Vector2(pos) + BLOCK_OFFSET
         self.rect = self.image.get_rect(topleft=self.pos * CELL_SIZE)
 
-    def horizontal_collide(self, x):
+    def horizontal_collide(self, x, field_data):
         if not 0 <= x < COLUMNS:
+            return True
+        if field_data[int(self.pos.y)][x]:
             return True
         return False
 
-    def vertical_collide(self, y):
+    def vertical_collide(self, y, field_data):
         if y >= ROWS:
             return True
-        return False  # explicit False
+        if y >= 0 and field_data[y][int(self.pos.x)]:
+            return True
+        return False
 
     def update(self):
         self.rect.topleft = self.pos * CELL_SIZE
+
+    def __str__(self):
+        return "hello"
