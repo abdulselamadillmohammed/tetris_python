@@ -73,20 +73,6 @@ class Game:
         self.display_surface.blit(self.surface, (PADDING,PADDING))
         pygame.draw.rect(self.display_surface, LINE_COLOR, self.rect,2, 2)
 
-class Block(pygame.sprite.Sprite):
-    def __init__(self, group, pos, color):
-        super().__init__(group)
-        self.image = pygame.Surface((CELL_SIZE, CELL_SIZE))
-        self.image.fill(color)
-
-
-        # position
-        self.pos = pygame.Vector2(pos) + BLOCK_OFFSET
-        self.rect = self.image.get_rect(topleft = self.pos * CELL_SIZE)
-    
-    def update(self):
-        #self.rect = self.image.get_rect(topleft = self.pos * CELL_SIZE)
-        self.rect.topleft = self.pos * CELL_SIZE
 
 class Tetromino:
     def __init__(self, shape, group):
@@ -98,13 +84,49 @@ class Tetromino:
         # create blocks
         self.blocks = [Block(group, pos, self.color) for pos in self.block_positions]
 
+    # collisions
+    def next_move_horizontal_collide(self, blocks, amount):
+        collision_list = [block.horizontal_collide(int(block.pos.x + amount)) for block in self.blocks]
+        return True if any(collision_list) else False
+
+
+    def next_move_vertical_collide(self, blocks, amount):
+        collision_list = [block.vertical_collide(int(block.pos.y + amount)) for block in self.blocks]
+        return True if any(collision_list) else False
+
     def move_horizontal(self, amount):
-        for block in self.blocks:
-            block.pos.x += amount
+        if not self.next_move_horizontal_collide(self.blocks, amount):
+            for block in self.blocks:
+                block.pos.x += amount
 
     def move_down(self):
-        for block in self.blocks:
-            block.pos.y += 1
+        if not self.next_move_vertical_collide(self.blocks, 1):
+            for block in self.blocks:
+                block.pos.y += 1
     
 
              
+
+class Block(pygame.sprite.Sprite):
+    def __init__(self, group, pos, color):
+        super().__init__(group)
+        self.image = pygame.Surface((CELL_SIZE, CELL_SIZE))
+        self.image.fill(color)
+
+
+        # position
+        self.pos = pygame.Vector2(pos) + BLOCK_OFFSET
+        self.rect = self.image.get_rect(topleft = self.pos * CELL_SIZE)
+    
+    def horizontal_collide(self, x):
+        if not 0 <= x < COLUMNS:
+            return True
+        return False
+    
+    def vertical_collide(self, y):
+        if y >= ROWS:
+            return True
+
+    def update(self):
+        #self.rect = self.image.get_rect(topleft = self.pos * CELL_SIZE)
+        self.rect.topleft = self.pos * CELL_SIZE
