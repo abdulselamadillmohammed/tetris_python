@@ -74,6 +74,15 @@ class Game:
                 self.tetromino.move_horizontal(1)
                 self.timers['horizontal move'].activate()
 
+    def check_finished_rows(self):
+        # get the full row indexes
+        delete_rows = []
+        for i, row in enumerate(self.field_data):
+            if all(row):
+                delete_rows.append(i)
+
+
+
     def run(self):
         self.input()
 
@@ -87,6 +96,7 @@ class Game:
         self.draw_grid()
         self.display_surface.blit(self.surface, (PADDING, PADDING))
         pygame.draw.rect(self.display_surface, LINE_COLOR, self.rect, 2, 2)
+
 
 
 class Tetromino:
