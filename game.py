@@ -24,7 +24,7 @@ class Game:
 
         # tetromino
         self.tetromino = Tetromino(
-            choice(list(TETROMINOS.keys())),
+            'I',#choice(list(TETROMINOS.keys())),
             self.sprites,
             self.create_new_tetromino,
             self.field_data
@@ -40,7 +40,7 @@ class Game:
     def create_new_tetromino(self):
         self.check_finished_rows()
         self.tetromino = Tetromino(
-            choice(list(TETROMINOS.keys())),
+            'I',#choice(list(TETROMINOS.keys())),
             self.sprites,
             self.create_new_tetromino,
             self.field_data
@@ -84,16 +84,22 @@ class Game:
 
         if delete_rows:
             for delete_row in delete_rows:
-                
-                # delete full rows
-                for block in self.field_data[delete_rows]:
-                    block.kill()
+                # delete all blocks in that row
+                for block in self.field_data[delete_row]:
+                    if block:  # make sure it's not 0
+                        block.kill()
 
-                # move down blocks
-                for row in self.field_data:
-                    for block in row:
-                        if block and block.pos.y < delete_row:
-                            block.pos.y += 1
+            # move blocks down
+            for row_index in range(max(delete_rows) - 1, -1, -1):
+                for block in self.field_data[row_index]:
+                    if block:
+                        block.pos.y += sum(1 for dr in delete_rows if dr > row_index)
+
+            # rebuild the field_data grid
+            self.field_data = [[0 for _ in range(COLUMNS)] for _ in range(ROWS)]
+            for block in self.sprites:
+                self.field_data[int(block.pos.y)][int(block.pos.x)] = block
+
 
     def run(self):
         self.input()
