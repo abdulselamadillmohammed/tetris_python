@@ -81,7 +81,12 @@ class Game:
             if all(row):
                 delete_rows.append(i)
 
-
+        if delete_rows:
+            for delete_rows in delete_rows:
+                
+                # delete full rows
+                for block in self.field_data[delete_rows]:
+                    block.kill()
 
     def run(self):
         self.input()
