@@ -24,7 +24,7 @@ class Game:
 
         # tetromino
         self.tetromino = Tetromino(
-            'I',#choice(list(TETROMINOS.keys())),
+            choice(list(TETROMINOS.keys())),
             self.sprites,
             self.create_new_tetromino,
             self.field_data
@@ -41,7 +41,7 @@ class Game:
     def create_new_tetromino(self):
         self.check_finished_rows()
         self.tetromino = Tetromino(
-            'I',#choice(list(TETROMINOS.keys())),
+            choice(list(TETROMINOS.keys())),
             self.sprites,
             self.create_new_tetromino,
             self.field_data
@@ -77,7 +77,7 @@ class Game:
                 self.timers['horizontal move'].activate()
 
         # check for rotation
-        if not self.timers['rotate'].activate:
+        if not self.timers['rotate'].active:
             if keys[pygame.K_UP]:
                 self.tetromino.rotate()
                 self.timers['rotate'].activate()
@@ -181,7 +181,7 @@ class Tetromino:
                     return
 
                 # verical / floor check
-                if pos.y > ROWS:
+                if pos.y >= ROWS:
                     return
 
 
