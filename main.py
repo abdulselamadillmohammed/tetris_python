@@ -47,7 +47,7 @@ class Main:
             # components
             self.game.run()
             self.score.run()
-            self.preview.run()
+            self.preview.run(self.next_shapes)
 
 
             # updating the game
