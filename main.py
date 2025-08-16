@@ -30,8 +30,9 @@ class Main:
 
     def get_next_shape(self):
         next_shape = self.next_shapes.pop(0)
-        self.next_shapes.append(choice(list(TETROMINOS)))
+        self.next_shapes.append(choice(list(TETROMINOS.keys())))
         return next_shape
+
 
     def run(self):
         while True:
