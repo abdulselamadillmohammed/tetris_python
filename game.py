@@ -93,7 +93,13 @@ class Game:
                 self.timers['rotate'].activate()
 
         # down speedup
+        if not self.down_pressed and keys[pygame.K_DOWN]:
+            self.down_pressed = True
+            self.timers['vertical move'].duration = self.down_speed_faster
 
+        if self.down_pressed and not keys[pygame.K_DOWN]:
+            self.down_pressed = False
+            self.timers['vertical move'].duration = self.down_speed
 
     def check_finished_rows(self):
         # get the full row indexes
