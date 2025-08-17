@@ -34,6 +34,10 @@ class Game:
             self.field_data
         )
 
+        self.down_speed = UPDATE_START_SPEED
+        self.down_speed_faster = self.down_speed * 0.3
+        self.down_pressed = False
+        
         self.timers = {
             'vertical move': Timer(UPDATE_START_SPEED, True, self.move_down),
             'horizontal move': Timer(MOVE_WAIT_TIME),
@@ -87,6 +91,9 @@ class Game:
             if keys[pygame.K_UP]:
                 self.tetromino.rotate()
                 self.timers['rotate'].activate()
+
+        # down speedup
+
 
     def check_finished_rows(self):
         # get the full row indexes
