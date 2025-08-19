@@ -74,7 +74,6 @@ class Game:
         if self.on_score_update:
             self.on_score_update(self.current_lines, self.current_score, self.current_level)  # was self.update_score(...)
 
-
     def create_new_tetromino(self):
         self.check_finished_rows()
 
